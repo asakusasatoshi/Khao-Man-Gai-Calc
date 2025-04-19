@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chef Ganesa｜カオマンガイ計算アプリ</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 1rem;
+      max-width: 800px;
+      margin: auto;
+    }
+    input {
+      padding: 0.5rem;
+      font-size: 1rem;
+      width: 100%;
+      margin-bottom: 1rem;
+    }
+    h1, h2 {
+      font-size: 1.3rem;
+      margin-top: 2rem;
+    }
+    ul {
+      padding-left: 1.2rem;
+    }
+    li {
+      margin-bottom: 0.4rem;
+    }
+    .section {
+      margin-top: 2rem;
+    }
+    pre {
+      white-space: pre-wrap;
+      background: #f7f7f7;
+      padding: 1rem;
+      border-left: 5px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+  <h1>🐘 Chef Ganesa｜カオマンガイ計算アプリ</h1>
+
+  <label for="servings">人数を入力（1〜30）：</label>
+  <input type="number" id="servings" value="1" min="1" max="30">
+
+  <div id="output"></div>
+
+  <div class="section">
+    <h2>📘 調理手順（参考用）</h2>
+    <pre id="instructions"></pre>
+  </div>
+
+  <script>
+    const calc = (amount, servings) => ({
+      unit: amount.toFixed(1),
+      total: (amount * servings).toFixed(1)
+    });
+
+    const ingredients = [
+      { name: "鶏もも肉", unit: "g", amount: 120 },
+      { name: "ジャスミンライス（乾燥）", unit: "g", amount: 96.7 },
+      { name: "浄水", unit: "ml", amount: 110 },
+      { name: "バイトゥーイ", unit: "g", amount: 0.53 },
+      { name: "にんにく", unit: "g", amount: 4.0 },
+      { name: "プリッキーヌ（炒め用）", unit: "g", amount: 1.0 },
+      { name: "ラード", unit: "g", amount: 5.0 },
+      { name: "卵（カイダーオ）", unit: "個", amount: 1 },
+      { name: "ホーリーバジル（炒め用）", unit: "g", amount: 4.0 },
+      { name: "ホーリーバジル（仕上げ用）", unit: "g", amount: 8.0 },
+      { name: "ホーリーバジルパウダー", unit: "g", amount: 0.2 },
+      { name: "パームシュガー", unit: "g", amount: 3.2 },
+      { name: "白こしょうホール", unit: "g", amount: 0.16 },
+      { name: "ナンプラー・プリック", unit: "g", amount: 15 },
+
+      // オールインワンソース内訳
+      { name: "ナンプラー（ソース用）", unit: "g", amount: 9.7 },
+      { name: "シーユーダム", unit: "g", amount: 3.9 },
+      { name: "シーユーカオ", unit: "g", amount: 3.7 },
+      { name: "シーズニングソース", unit: "g", amount: 1.9 },
+      { name: "オイスターソース", unit: "g", amount: 10.3 }
+    ];
+
+    const instructions = `
+【仕込み工程】
+● ごはん（炊飯）
+ジャスミンライス1450gを軽くすすぐ（研がない）
+浄水1650ml＋バイトゥーイ約8gを加える
+30分浸水 → 通常炊飯 → 10分蒸らし → しゃもじで全体をほぐして保温
+
+● 肉・香味素材の下準備
+鶏もも肉を120g/人で用意 → 粗挽き加工
+にんにく・プリッキーヌ → クロックヒンで潰す
+ホーリーバジルは炒め用・仕上げ用に分けて冷蔵
+
+● オールインワンソース仕込み（合計441g／15人前）
+- ナンプラー：145g
+- シーユーダム：58.5g
+- シーユーカオ：55.5g
+- シーズニングソース：28g
+- オイスターソース：155g
+→ すべてを混合し冷蔵保存
+
+【炒め調理】
+ラード＋にんにく＆プリッキーヌを弱火で香味油に → 香味油は一旦避ける
+肉を強火で炒めて焼き色 → 中火でカリッと
+炒め用バジル投入 → 強火10秒 → パームシュガーを溶かし絡める
+オールインワンソース＋白こしょうを加え混ぜる → 香味油を戻す
+加熱後、150gに小分けして保存
+
+【提供工程】
+● ごはん
+ジャスミンライス220g（大盛は250g）
+
+● 炒め物仕上げ
+炒め物150gを電子レンジ1400Wで60秒
+ホーリーバジルパウダー0.2gふりかけて混ぜる
+仕上げ用バジルを加えて軽く混ぜる
+
+● トッピング
+カイダーオ（目玉焼き）をラードで揚げ焼き
+ナンプラープリックを15g添える
+
+● 盛り付け構成
+ライス220g＋炒め物150g＋カイダーオ＋ナンプラープリック
+`;
+
+    function updateOutput() {
+      const s = parseInt(document.getElementById('servings').value);
+      const list = ingredients.map(item => {
+        const calcVal = calc(item.amount, s);
+        return `<li>${item.name}：${item.amount}${item.unit} × ${s}人前 ＝ <strong>${calcVal.total}${item.unit}</strong></li>`;
+      }).join("\n");
+
+      document.getElementById('output').innerHTML = `
+        <h2>📦 材料（${s}人前分量）</h2>
+        <ul>${list}</ul>`;
+
+      document.getElementById('instructions').textContent = instructions;
+    }
+
+    document.getElementById('servings').addEventListener('input', updateOutput);
+    updateOutput();
+  </script>
+</body>
+</html>
